@@ -1,0 +1,39 @@
+services:
+  api:
+    container_name: crud-api
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+      - ./data:/var/www/html/data
+    environment:
+      - PHP_ENV=development
+
+  db:
+    image: mysql:8.0
+    container_name: crud-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: DB230517
+      MYSQL_DATABASE: store
+      MYSQL_USER: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data/db.sql:/docker-entrypoint-initdb.d/db.sql
+      - db_data:/var/lib/mysql
+
+  web:
+    image: php:8.2-apache
+    container_name: crud-web
+    restart: always
+    ports:
+      - "8081:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+
+volumes:
+  db_data:
